@@ -3,7 +3,7 @@ use feature ':5.10';
 
 use Moose;
 use Moose::Util::TypeConstraints;
-use MooseX::Types::Path::Class qw(File Dir);
+use MooseX::Types::Path::Class qw(File);
 
 use HTTP::Daemon;
 use HTTP::Headers;
@@ -17,9 +17,10 @@ use App::TemplateServer::Context;
 
 use Package::FromData;
 use Method::Signatures;
+use URI::Escape;
 use YAML::Syck qw(LoadFile);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $AUTHORITY = 'cpan:JROCKWAY';
 
 with 'MooseX::Getopt';
@@ -32,9 +33,9 @@ has 'port' => (
 
 has 'docroot' => (
     is       => 'ro',
-    isa      => Dir,
+    isa      => 'ArrayRef[Str]',
+    default  => sub { [$ENV{PWD}] },
     coerce   => 1,
-    default  => sub { $ENV{PWD} },
     lazy     => 1,
 );
 
@@ -81,8 +82,18 @@ has '_data' => (
 );
 
 coerce 'ClassName'
-  => as 'Str',
-  => via { Class::MOP::load_class($_) and $_ };
+  => as 'Str'
+  => via { # so much code for nothing.  oh well :)
+      my $loaded;
+      for ($_, "App::TemplateServer::Provider::$_"){
+          eval {
+              if(Class::MOP::load_class($_)){
+                  return $loaded = $_;
+              }
+          } and last;
+      }
+      return $loaded || die "failed to coerce $_ to a provider class";
+  };
 
 has 'provider_class' => (
     metaclass  => 'MooseX::Getopt::Meta::Attribute',
@@ -178,7 +189,7 @@ method _mk_context($req) {
 
 method _render_template($req) {
     my $context = $self->_mk_context($req);
-    my $template = $req->uri;
+    my $template = uri_unescape($req->uri->path);
     $template =~ s{^/}{};
     my $content = $self->provider->render_template($template, $context);
     return _success($content);
@@ -249,6 +260,12 @@ directory.
 The class name of the Provider to use.  Defaults to
 C<App::TemplateServer::Provider::TT>, but you can get others from the
 CPAN (for using templating systems other than TT).
+
+As of version 0.02, you can omit the
+C<App::TemplateServer::Provider::> prefix if you prefer.  The literal
+class you pass will be loaded first; if that fails then the
+C<App::TemplateServer::Provider::> prefix is added.  Failing that, an
+exception is thrown.
 
 =head2 datafile
 

@@ -15,6 +15,8 @@ lib/App/TemplateServer/Context.pm
 lib/App/TemplateServer/Page.pm
 lib/App/TemplateServer/Page/Index.pm
 lib/App/TemplateServer/Provider.pm
+lib/App/TemplateServer/Provider/Filesystem.pm
+lib/App/TemplateServer/Provider/Null.pm
 lib/App/TemplateServer/Provider/TT.pm
 lib/App/TemplateServer/Types.pm
 Makefile.PL
@@ -25,4 +27,5 @@ README
 t/00-load.t
 t/author/pod-coverage.t
 t/author/pod.t
+t/null-provider.t
 t/tt-provider.t
