@@ -28,4 +28,5 @@ t/00-load.t
 t/author/pod-coverage.t
 t/author/pod.t
 t/null-provider.t
+t/synopsis.t
 t/tt-provider.t
