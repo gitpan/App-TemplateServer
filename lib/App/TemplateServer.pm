@@ -20,7 +20,7 @@ use Method::Signatures;
 use URI::Escape;
 use YAML::Syck qw(LoadFile);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $AUTHORITY = 'cpan:JROCKWAY';
 
 with 'MooseX::Getopt';
@@ -68,7 +68,7 @@ has '_data' => (
             given(ref $class){
                 when('HASH'){
                     my ($package, $method) = %$class;
-                    $raw_data->{$var} = $package->method;
+                    $raw_data->{$var} = $package->$method;
                 }
                 default {
                     $raw_data->{$var} = $class->new;
@@ -287,7 +287,7 @@ example:
     instantiate:
       test_instance: "Test"
       another_test_instance:
-        - Test: "new"
+        Test: "new"
 
 This makes the variables C<foo>, C<test_instance>, and
 C<another_test_instance> available in the templates.  It also creates

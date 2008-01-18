@@ -3,6 +3,7 @@ abstract: application to serve processed templates
 author: 
   - Jonathan Rockway C<< <jrockway@cpan.org> >>
 build_requires: 
+  Data::Dumper: 0
   Directory::Scratch: 0
   Test::More: 0
   ok: 0
@@ -21,7 +22,7 @@ requires:
   HTTP::Daemon: 0
   List::Util: 0
   Method::Signatures: 0
-  Moose: 0
+  Moose: 0.33
   MooseX::Getopt: 0
   MooseX::Types::Path::Class: 0
   Package::FromData: 0
@@ -29,4 +30,4 @@ requires:
   Template: 0
   URI::Escape: 0
   YAML::Syck: 0
-version: 0.02
+version: 0.03
